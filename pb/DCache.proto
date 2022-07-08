@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "../pb";
+
 package DCache;
 
 //Get请求
@@ -14,5 +16,5 @@ message GetResponse {
 }
 
 service DCache {
-    rpc Get(GetRequest) returns (GetResponse)
+    rpc Get(GetRequest) returns (GetResponse);
 }

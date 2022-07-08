@@ -55,3 +55,8 @@ func (c *ConsistentHash) GetNode(key string) string {
 	//index == len(c.ring)时交由第一个节点处理
 	return c.hashMap[c.ring[index%len(c.ring)]]
 }
+
+//真实节点的前一个节点
+func PrevNode(key string) string {
+	return ""
+}

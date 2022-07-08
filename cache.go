@@ -8,8 +8,8 @@ import (
 //对LRU缓存进行封装，使其并发安全
 type cache struct {
 	rw           sync.RWMutex
-	lru          *lru.LRUCache
-	nbytes       int64
+	lru          *lru.LRUCache //LRU缓存
+	nbytes       int64         //缓存内存占用
 	ngets, nhits int64
 }
 
@@ -44,4 +44,12 @@ func (c *cache) get(key string) (value Value, ok bool) {
 	c.nhits++
 
 	return val.(Value), true
+}
+
+//删除最近最久未使用的缓存，并返回内存占用
+func (c *cache) removeLeastUsed() int64 {
+	c.rw.Lock()
+	defer c.rw.Unlock()
+	c.lru.RemoveLeastUsed()
+	return c.nbytes
 }
