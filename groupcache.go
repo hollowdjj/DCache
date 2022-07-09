@@ -2,6 +2,7 @@ package DCache
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/hollowdjj/DCache/pb"
@@ -80,6 +81,7 @@ func (g *GroupCache) GetCacheValue(key string) (Value, error) {
 
 	//先查本地缓存
 	if val, hit := g.LookupLocalCache(key); hit {
+		log.Println("[INFO]Get cache from local cache")
 		return val, nil
 	}
 
@@ -134,6 +136,7 @@ func (g *GroupCache) getFromPeer(peer Peer, key string) (Value, error) {
 	if err != nil {
 		return Value{}, fmt.Errorf("Get cache from peer [%v] failed: %v", peer.Addr(), err)
 	}
+	log.Printf("[INFO]Get cache from remote: %v", peer.Addr())
 	return Value{b: resp.GetValue()}, nil
 }
 
@@ -146,6 +149,7 @@ func (g *GroupCache) getFromGetter(key string) (Value, error) {
 	if err != nil {
 		return Value{}, err
 	}
+	log.Println("[INFO]Get cache from Getter")
 	return Value{b: bytes}, nil
 }
 
