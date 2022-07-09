@@ -37,6 +37,7 @@ func (h *HttpPool) SetPeers(addrs ...string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.hash = consistent.New(defaultReplicas, nil)
+	h.peers = make(map[string]Peer)
 	for _, addr := range addrs {
 		h.peers[addr] = &httpPeer{remoteBaseUrl: addr + defaultRoute}
 	}
