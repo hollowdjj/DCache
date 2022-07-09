@@ -19,7 +19,7 @@ type Getter interface {
 type GetterFunc func(key string) ([]byte, error)
 
 func (g GetterFunc) Get(key string) ([]byte, error) {
-	return g.Get(key)
+	return g(key)
 }
 
 var (
