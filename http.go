@@ -1,7 +1,7 @@
 package dcache
 
 import (
-	"DCache/consistent"
+	"github/hollowdjj/DCache/consistent"
 	"sync"
 )
 
