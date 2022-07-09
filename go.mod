@@ -1,7 +1,5 @@
 module github/hollowdjj/DCache
 
-replace github/hollowdjj/DCache => ../DCache
-
 go 1.17
 
 require (
