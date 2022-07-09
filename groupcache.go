@@ -24,7 +24,7 @@ func (g GetterFunc) Get(key string) ([]byte, error) {
 
 var (
 	rw     sync.RWMutex
-	groups map[string]*GroupCache
+	groups = make(map[string]*GroupCache)
 )
 
 type GroupCache struct {
