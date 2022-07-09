@@ -41,6 +41,7 @@ func (h *HttpPool) SetPeers(addrs ...string) {
 	for _, addr := range addrs {
 		h.peers[addr] = &httpPeer{remoteBaseUrl: addr + defaultRoute}
 	}
+	h.hash.AddNodes(addrs...)
 }
 
 //根据key的哈希值选择节点。
