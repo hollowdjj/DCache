@@ -1,8 +1,9 @@
 package DCache
 
 import (
-	"github/hollowdjj/DCache/lru"
 	"sync"
+
+	"github.com/hollowdjj/DCache/lru"
 )
 
 //对LRU缓存进行封装，使其并发安全

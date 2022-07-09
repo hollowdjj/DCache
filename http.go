@@ -1,8 +1,9 @@
 package DCache
 
 import (
-	"github/hollowdjj/DCache/consistent"
 	"sync"
+
+	"github.com/hollowdjj/DCache/consistent"
 )
 
 const (

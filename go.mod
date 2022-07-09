@@ -1,6 +1,6 @@
-module github/hollowdjj/DCache
+module github.com/hollowdjj/DCache
 
-go 1.17
+go 1.18
 
 require (
 	github.com/bits-and-blooms/bloom/v3 v3.2.0
