@@ -56,6 +56,11 @@ type GroupCache struct {
 	bloom *bloom.BloomFilter
 }
 
+//注册peerpicker
+func (g *GroupCache) RegisterPeerPicker(picker PeerPicker) {
+	g.peers = picker
+}
+
 //创建并激活一个存放大约n个元素，误判率为fp的布隆过滤器
 func (g *GroupCache) EnableBloomFilter(n uint, fp float64) {
 	g.bloom = bloom.NewWithEstimates(n, fp)
@@ -69,7 +74,7 @@ func (g *GroupCache) GetCacheValue(key string) (Value, error) {
 	}
 
 	if g.enableBloomFilter && !g.bloom.Test([]byte(key)) {
-		return Value{}, fmt.Errorf("Key [%v] is not in bloom filter")
+		return Value{}, fmt.Errorf("Key [%v] is not in bloom filter", key)
 	}
 
 	//先查本地缓存
@@ -77,7 +82,7 @@ func (g *GroupCache) GetCacheValue(key string) (Value, error) {
 		return val, nil
 	}
 
-	//加载缓存
+	//本地缓冲中没有，那么加载缓存至本地缓存
 	val, err := g.loadCache(key)
 	if err != nil {
 		return Value{}, err
@@ -113,7 +118,11 @@ func (g *GroupCache) loadCache(key string) (Value, error) {
 		return Value{}, err
 	}
 
-	return val.(Value), nil
+	//将缓存写入mainCache以及hotCache
+	res := val.(Value)
+	g.mainCache.add(key, res)
+	g.hotCache.add(key, res)
+	return res, nil
 }
 
 //查询远端缓存
@@ -129,6 +138,9 @@ func (g *GroupCache) getFromPeer(peer Peer, key string) (Value, error) {
 
 //通过getter获取缓存
 func (g *GroupCache) getFromGetter(key string) (Value, error) {
+	if g.getter == nil {
+		return Value{}, nil
+	}
 	bytes, err := g.getter.Get(key)
 	if err != nil {
 		return Value{}, err

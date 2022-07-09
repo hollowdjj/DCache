@@ -28,15 +28,15 @@ type httpPeer struct {
 
 func (h *httpPeer) Get(req *pb.GetRequest, resp *pb.GetResponse) error {
 	//拼接完整url
-	url := fmt.Sprint("%v?group=%v&key=%v", h.remoteBaseUrl,
+	url := fmt.Sprintf("%v?group=%v&key=%v", h.remoteBaseUrl,
 		url.QueryEscape(req.GetGroup()), url.QueryEscape(req.GetKey()))
 
 	//发送http请求
 	response, err := http.Get(url)
-	defer response.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer response.Body.Close()
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return err
@@ -49,5 +49,5 @@ func (h *httpPeer) Get(req *pb.GetRequest, resp *pb.GetResponse) error {
 }
 
 func (h *httpPeer) Addr() string {
-	return h.Addr()
+	return h.remoteBaseUrl
 }

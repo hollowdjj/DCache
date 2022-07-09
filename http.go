@@ -20,14 +20,14 @@ type HttpPool struct {
 	//一致性哈希
 	hash *consistent.ConsistentHash
 
-	//与哈希环上所有的peer的http连接
+	//与所有真实节点的连接
 	peers map[string]Peer
 }
 
 //创建一个HttpPool实例
-func New(addr string) *HttpPool {
+func NewHttpPool(selfAddr string) *HttpPool {
 	return &HttpPool{
-		selfAddr: addr,
+		selfAddr: selfAddr,
 	}
 }
 

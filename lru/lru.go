@@ -87,6 +87,8 @@ func (l *LRUCache) RemoveLeastUsed() {
 	target := l.list.Back()
 	if target != nil {
 		l.list.Remove(target)
+		key := target.Value.(*entry).key
+		delete(l.cache, key)
 	}
 }
 
