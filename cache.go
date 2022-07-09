@@ -1,4 +1,4 @@
-package dcache
+package DCache
 
 import (
 	"github/hollowdjj/DCache/lru"

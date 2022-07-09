@@ -1,4 +1,4 @@
-package dcache
+package DCache
 
 //缓存k-v中的值类型，只能是byte数组或者字符串。
 //若b != nil，那么使用的是b，否则为s
