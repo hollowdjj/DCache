@@ -4,7 +4,7 @@ import "testing"
 
 func TestLRUCache(t *testing.T) {
 	//测试Add
-	c1 := New(3)
+	c1 := New()
 	var c2 LRUCache
 	for i := 0; i < 5; i++ {
 		c1.Add(i, i)

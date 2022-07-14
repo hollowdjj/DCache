@@ -25,14 +25,14 @@ type HttpPool struct {
 	peers map[string]Peer
 }
 
-//创建一个HttpPool实例
+//创建一个HttpPool实例。selfAddr eg:127.0.0.1:8000
 func NewHttpPool(selfAddr string) *HttpPool {
 	return &HttpPool{
 		selfAddr: selfAddr,
 	}
 }
 
-//设置peer
+//初始化一致性哈希，并设置peer
 func (h *HttpPool) SetPeers(addrs ...string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -42,6 +42,11 @@ func (h *HttpPool) SetPeers(addrs ...string) {
 		h.peers[addr] = &httpPeer{remoteBaseUrl: "http://" + addr + defaultRoute}
 	}
 	h.hash.AddNodes(addrs...)
+}
+
+//设置一致性哈希
+func (h *HttpPool) SetConsistentHash(hash *consistent.ConsistentHash) {
+	h.hash = hash
 }
 
 //根据key的哈希值选择节点。

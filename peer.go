@@ -12,7 +12,7 @@ import (
 )
 
 type PeerPicker interface {
-	PickPeer(key string) (Peer, bool)
+	PickPeer(key string) (Peer, bool) //根据key值选取节点
 }
 
 //抽象的peer节点(可以是http客户端，也可以是一个rpc调用)

@@ -5,9 +5,6 @@ import (
 )
 
 type LRUCache struct {
-	//最大缓存元素数量，0表示无上限(但仍然会受到系统内存限制)
-	MaxEntries int
-
 	//双向链表+哈希表实现LRU缓存
 	list  *list.List
 	cache map[interface{}]*list.Element
@@ -24,11 +21,10 @@ type entry struct {
 
 //生成一个LRU缓存。
 //若MaxEntries为0，表示缓存元素无上限(但仍会受到系统内存限制)
-func New(MaxEntries int) *LRUCache {
+func New() *LRUCache {
 	return &LRUCache{
-		MaxEntries: MaxEntries,
-		list:       list.New(),
-		cache:      make(map[interface{}]*list.Element),
+		list:  list.New(),
+		cache: make(map[interface{}]*list.Element),
 	}
 }
 
@@ -50,11 +46,6 @@ func (l *LRUCache) Add(key interface{}, val interface{}) {
 	//插入新元素
 	newNode := l.list.PushFront(&entry{key, val})
 	l.cache[key] = newNode
-
-	//缓存淘汰
-	if l.MaxEntries > 0 && l.list.Len() > l.MaxEntries {
-		l.RemoveLeastUsed()
-	}
 }
 
 //根据key查找缓存

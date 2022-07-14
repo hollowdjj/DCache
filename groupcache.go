@@ -72,11 +72,11 @@ func (g *GroupCache) EnableBloomFilter(n uint, fp float64) {
 //从GroupCache中获取缓存值
 func (g *GroupCache) GetCacheValue(key string) (Value, error) {
 	if key == "" {
-		return Value{}, fmt.Errorf("Key requied inorder to get cache")
+		return Value{}, fmt.Errorf("key requied inorder to get cache")
 	}
 
 	if g.enableBloomFilter && !g.bloom.Test([]byte(key)) {
-		return Value{}, fmt.Errorf("Key [%v] is not in bloom filter", key)
+		return Value{}, fmt.Errorf("key [%v] is not in bloom filter", key)
 	}
 
 	//先查本地缓存
