@@ -2,11 +2,11 @@ package DCache
 
 import (
 	"fmt"
-	"log"
 	"sync"
 
 	"github.com/hollowdjj/DCache/pb"
 	"github.com/hollowdjj/DCache/singleshot"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bits-and-blooms/bloom/v3"
 )
@@ -72,16 +72,21 @@ func (g *GroupCache) EnableBloomFilter(n uint, fp float64) {
 //从GroupCache中获取缓存值
 func (g *GroupCache) GetCacheValue(key string) (Value, error) {
 	if key == "" {
-		return Value{}, fmt.Errorf("Key requied inorder to get cache")
+		return Value{}, fmt.Errorf("key requied inorder to get cache")
 	}
 
 	if g.enableBloomFilter && !g.bloom.Test([]byte(key)) {
-		return Value{}, fmt.Errorf("Key [%v] is not in bloom filter", key)
+		return Value{}, fmt.Errorf("key [%v] is not in bloom filter", key)
 	}
 
 	//先查本地缓存
 	if val, hit := g.LookupLocalCache(key); hit {
-		log.Println("[INFO]Get cache from local cache")
+		if enableLogger {
+			GetLogger().WithFields(logrus.Fields{
+				"group": g.name,
+				"key":   key,
+			}).Info("get cache from local cache")
+		}
 		return val, nil
 	}
 
@@ -136,7 +141,13 @@ func (g *GroupCache) getFromPeer(peer Peer, key string) (Value, error) {
 	if err != nil {
 		return Value{}, fmt.Errorf("Get cache from peer [%v] failed: %v", peer.Addr(), err)
 	}
-	log.Printf("[INFO]Get cache from remote: %v", peer.Addr())
+	if enableLogger {
+		GetLogger().WithFields(logrus.Fields{
+			"remote": peer.Addr(),
+			"group":  g.name,
+			"key":    key,
+		}).Info("get cache from remote")
+	}
 	return Value{b: resp.GetValue()}, nil
 }
 
@@ -149,7 +160,12 @@ func (g *GroupCache) getFromGetter(key string) (Value, error) {
 	if err != nil {
 		return Value{}, err
 	}
-	log.Println("[INFO]Get cache from Getter")
+	if enableLogger {
+		GetLogger().WithFields(logrus.Fields{
+			"group": g.name,
+			"key":   key,
+		}).Info("get cache from getter")
+	}
 	return Value{b: bytes}, nil
 }
 
@@ -171,6 +187,6 @@ func NewGroupCache(name string, maxBytes int64, getter Getter) *GroupCache {
 func GetGroupCache(name string) *GroupCache {
 	rw.RLock()
 	defer rw.RUnlock()
-	g, _ := groups[name]
+	g := groups[name]
 	return g
 }
