@@ -1,9 +1,9 @@
-package DCache
+package cache
 
 import (
 	"sync"
 
-	"github.com/hollowdjj/DCache/consistent"
+	"github.com/hollowdjj/course-selecting-sys/cache/consistent"
 )
 
 const (
@@ -32,16 +32,52 @@ func NewHttpPool(selfAddr string) *HttpPool {
 	}
 }
 
-//初始化一致性哈希，并设置peer
-func (h *HttpPool) SetPeers(addrs ...string) {
+//init consistent hash if it is not initialized and add peers.
+//return all current realworld nodes on hash ring. Concurrency safe
+func (h *HttpPool) AddPeers(addrs ...string) []string {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	h.hash = consistent.New(defaultReplicas, nil)
-	h.peers = make(map[string]Peer)
+	//lazy initialization
+	if h.hash == nil {
+		h.hash = consistent.New(defaultReplicas, nil)
+	}
+	if h.peers == nil {
+		h.peers = make(map[string]Peer)
+	}
+
 	for _, addr := range addrs {
 		h.peers[addr] = &httpPeer{remoteBaseUrl: "http://" + addr + defaultRoute}
 	}
 	h.hash.AddNodes(addrs...)
+	var res []string
+	for k := range h.peers {
+		res = append(res, k)
+	}
+	return res
+}
+
+//return all peers, concurrency safe
+func (h *HttpPool) GetPeers() []string {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	var res []string
+	for k := range h.peers {
+		res = append(res, k)
+	}
+	return res
+}
+
+//delete peer
+func (h *HttpPool) DelPeer(host string) []string {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	delete(h.peers, host)
+	h.hash.DelNode(host)
+	var res []string
+	for k := range h.peers {
+		res = append(res, k)
+	}
+	return res
 }
 
 //设置一致性哈希

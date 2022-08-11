@@ -1,4 +1,4 @@
-package DCache
+package cache
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/hollowdjj/DCache/pb"
+	"github.com/hollowdjj/course-selecting-sys/cache/pb"
 
 	"google.golang.org/protobuf/proto"
 )

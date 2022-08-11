@@ -15,6 +15,7 @@ type ConsistentHash struct {
 	replicas int            //虚拟节点个数
 	ring     []int          //哈希环(存放的是虚拟节点)
 	hashMap  map[int]string //虚拟节点与真实节点的映射值
+	hosts    []string       //realworld hosts on this hash ring
 }
 
 //生成一致性哈希实例
@@ -41,6 +42,7 @@ func (c *ConsistentHash) AddNodes(realNodes ...string) {
 		}
 	}
 	sort.Ints(c.ring)
+	c.hosts = append(c.hosts, realNodes...)
 }
 
 //判断key落在哈希环上的哪个节点
@@ -54,6 +56,20 @@ func (c *ConsistentHash) GetNode(key string) string {
 
 	//index == len(c.ring)时交由第一个节点处理
 	return c.hashMap[c.ring[index%len(c.ring)]]
+}
+
+//del realworld nodes on hash ring
+func (c *ConsistentHash) DelNode(key string) {
+	var others []string
+	for _, host := range c.hosts {
+		if host != key {
+			others = append(others, host)
+		}
+	}
+	c.ring = []int{}
+	c.hashMap = make(map[int]string)
+	c.hosts = []string{}
+	c.AddNodes(others...)
 }
 
 //真实节点的前一个节点
